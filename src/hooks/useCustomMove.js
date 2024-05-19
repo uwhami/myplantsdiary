@@ -3,7 +3,7 @@ import { createSearchParams, useNavigate, useSearchParams } from "react-router-d
 const getNum = (param, defaultValue) => {
   if (!param) {
       return defaultValue;
-  };
+  }
   return parseInt(param);
 };
 
@@ -30,7 +30,14 @@ const useCustomMove = () => {
         navigate({ pathname: "../list", search: queryStr });
     };
 
-    return { moveToList };
+    const moveToModify = (num) => {
+        navigate({
+            pathname: `../modify/${num}`,
+            search: queryDefault
+        });
+    };
+
+    return { moveToList, moveToModify, page, size };
 };
 
 export default useCustomMove;
