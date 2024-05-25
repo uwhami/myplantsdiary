@@ -44,13 +44,21 @@ const useCustomMove = () => {
   };
 
   const moveToModify = (num) => {
+    console.log("moveToModify", num);
     navigate({
       pathname: `../modify/${num}`,
       search: queryDefault,
     });
   };
 
-  return { moveToList, moveToModify, page, size, refresh };
+  const moveToRead = (num) => {
+    navigate({
+      pathname: `../read/${num}`,
+      search: queryDefault,
+    });
+  };
+
+  return { moveToList, moveToModify, moveToRead, page, size, refresh };
 };
 
 export default useCustomMove;
