@@ -17,7 +17,6 @@ function AddComponent(props) {
     todo[e.target.name] = e.target.value;
 
     setTodo({ ...todo });
-    console.log(todo);
   };
 
   const handleClickAdd = () => {
