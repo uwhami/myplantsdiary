@@ -1,5 +1,8 @@
 import React, { useRef, useState } from "react";
 import { postAdd } from "../../api/productsApi";
+import FetchingModal from "../common/FetchingModal";
+import ResultModal from "../common/ResultModal";
+import useCustomMove from "../../hooks/useCustomMove";
 
 const initState = {
   pname: "",
@@ -14,6 +17,10 @@ function AddComponent(props) {
   const [product, setProduct] = useState({ ...initState });
 
   const uploadRef = useRef();
+  const [fetching, setFetching] = useState(false);
+  const [result, setResult] = useState(false);
+
+  const { moveToList } = useCustomMove();
 
   // multipart/form-data FormData()
 
@@ -36,7 +43,18 @@ function AddComponent(props) {
 
     console.log(formData);
 
-    postAdd(formData);
+    setFetching(true);
+
+    postAdd(formData).then((data) => {
+      setFetching(false);
+      setResult(data.result);
+      console.log(data.result);
+    });
+  };
+
+  const closeModal = () => {
+    setResult(null);
+    moveToList();
   };
 
   return (
@@ -99,6 +117,17 @@ function AddComponent(props) {
           </button>
         </div>
       </div>
+
+      {fetching ? <FetchingModal /> : <></>}
+      {result ? (
+        <ResultModal
+          title={"Product Add Result"}
+          content={`${result} Register Completed`}
+          callbackFn={closeModal}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
