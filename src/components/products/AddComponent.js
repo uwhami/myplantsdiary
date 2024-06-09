@@ -12,7 +12,7 @@ const initState = {
 };
 
 // new FormData() -> POST, PUT
-
+/* eslint-disable multiline-ternary */
 function AddComponent(props) {
   const [product, setProduct] = useState({ ...initState });
 
