@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getOne } from "../../api/productsApi";
+import { deleteOne, getOne, putOne } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import { API_SERVER_HOST } from "../../api/todoApi";
 
@@ -45,12 +45,73 @@ function ModifyComponent({ pno }) {
     setProduct({ ...product });
   };
 
+  const handleClickModify = () => {
+    const formData = new FormData();
+    const files = uploadRef.current.files;
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i]);
+    }
+    formData.append("pname", product.pname);
+    formData.append("pdesc", product.pdesc);
+    formData.append("price", product.price);
+    formData.append("delFlag", product.delFlag);
+
+    for (let i = 0; i < product.uploadFileNames.length; i++) {
+      formData.append("uploadFileNames", product.uploadFileNames[i]);
+    }
+
+    putOne(pno, formData).then((data) => {
+      console.log(data);
+    });
+  };
+
+  const handleClickDelete = () => {
+    deleteOne(pno).then((data) => {
+      console.log("delete result", data);
+      setResult(data.RESULT === "SUCCESS" ? "Deleted" : null);
+    });
+  };
+
   return (
     <div className="border-2 order-sky-200 mt-10 m-2 p-4">
       Products Modify Component
       {fetching ? <FetchingModal /> : <></>}
-      {makeDiv("name", product.pname, true, "text", handleChangeProduct)}
-      {makeDiv("price", product.price, false, "number", handleChangeProduct)}
+      <div className="flex justify-center">
+        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+          <div className="w-1/5 p-6 text-right font-bold">NAME</div>
+          <input
+            className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+            name="pname"
+            type="text"
+            value={product.pname}
+            onChange={handleChangeProduct}
+          ></input>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+          <div className="w-1/5 p-6 text-right font-bold">description</div>
+          <input
+            className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+            name="pdesc"
+            type="text"
+            value={product.pdesc}
+            onChange={handleChangeProduct}
+          ></input>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        <div className="relative mb-4 flex w-full flex-wrap items-stretch">
+          <div className="w-1/5 p-6 text-right font-bold">price</div>
+          <input
+            className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
+            name="price"
+            type="number"
+            value={product.price}
+            onChange={handleChangeProduct}
+          ></input>
+        </div>
+      </div>
       <div className="flex justify-center">
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <div className="w-1/5 p-6 text-right font-bold">DELETE</div>
@@ -93,30 +154,31 @@ function ModifyComponent({ pno }) {
                 </button>
                 <img
                   alt="img"
-                  src={`${host}/api/products/view/S_${product.uploadFileNames[0]}`}
+                  src={`${host}/api/products/view/S_${product.uploadFileNames[i]}`}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
+      <div className="flex justify-end p-4">
+        <button
+          type="button"
+          className="inline-block rounded p-4 m-2 text-xl w-32 text-white bg-red-500"
+          onClick={handleClickDelete}
+        >
+          Delete
+        </button>
+        <button
+          type="button"
+          className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500"
+          onClick={handleClickModify}
+        >
+          Modify
+        </button>
+      </div>
     </div>
   );
 }
-
-const makeDiv = (title, value, readonly, type, handleChangeProduct) => (
-  <div className="flex justify-center">
-    <div className="relative mb-4 flex w-full flex-wrap items-stretch">
-      <div className="w-1/5 p-6 text-right font-bold">{title}</div>
-      <input
-        className="w-4/5 p-6 rounded-r border border-solid border-neutral-300 shadow-md"
-        name={title}
-        type={type}
-        value={value}
-        onChange={handleChangeProduct}
-      ></input>
-    </div>
-  </div>
-);
 
 export default ModifyComponent;
