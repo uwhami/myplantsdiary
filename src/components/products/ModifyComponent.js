@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { deleteOne, getOne, putOne } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import { API_SERVER_HOST } from "../../api/todoApi";
+import ResultModal from "../common/ResultModal";
+import useCustomMove from "../../hooks/useCustomMove";
 
+/* eslint-disable multiline-ternary */
 const initState = {
   pno: 0,
   pname: "",
@@ -17,7 +20,8 @@ const host = API_SERVER_HOST;
 function ModifyComponent({ pno }) {
   const [product, setProduct] = useState({ ...initState });
   const [fetching, setFetching] = useState(false);
-  const [result, setResult] = useState(false);
+  const [result, setResult] = useState(null);
+  const { moveToRead, moveToList } = useCustomMove();
 
   const uploadRef = useRef();
 
@@ -61,7 +65,11 @@ function ModifyComponent({ pno }) {
     }
 
     putOne(pno, formData).then((data) => {
-      console.log(data);
+      setFetching(true);
+      if (data.RESULT === "SUCCESS") {
+        setResult("Modified");
+        setFetching(false);
+      }
     });
   };
 
@@ -70,6 +78,16 @@ function ModifyComponent({ pno }) {
       console.log("delete result", data);
       setResult(data.RESULT === "SUCCESS" ? "Deleted" : null);
     });
+  };
+
+  const closeModal = () => {
+    if (result === "Deleted") {
+      moveToList();
+    } else if (result === "Modified") {
+      moveToRead(pno);
+    } else {
+      setResult(null);
+    }
   };
 
   return (
@@ -177,6 +195,15 @@ function ModifyComponent({ pno }) {
           Modify
         </button>
       </div>
+      {result ? (
+        <ResultModal
+          title="처리 결과"
+          content={`${result} ${pno} Completed`}
+          callbackFn={closeModal}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
