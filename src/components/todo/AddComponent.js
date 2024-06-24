@@ -8,6 +8,7 @@ const initState = {
   dueDate: "",
 };
 
+/* eslint-disable multiline-ternary */
 function AddComponent(props) {
   const [todo, setTodo] = useState({ ...initState });
   const [result, setResult] = useState(null);

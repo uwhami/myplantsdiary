@@ -11,6 +11,7 @@ const initState = {
   complete: false,
 };
 
+/* eslint-disable multiline-ternary */
 function ModifyComponent({ tno }) {
   const [todo, setTodo] = useState(initState);
   const [result, setResult] = useState(null);

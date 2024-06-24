@@ -1,5 +1,6 @@
 import React from "react";
 
+/* eslint-disable multiline-ternary */
 function PageComponent({ serverData, movePage }) {
   return (
     <div className="m-6 flex justify-center">
