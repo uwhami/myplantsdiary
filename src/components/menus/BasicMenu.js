@@ -35,9 +35,15 @@ function BasicMenu(props) {
       </div>
 
       <div className="w-1/5 flex justify-end bg-orange-300 p-4 front-medium">
-        <div className="text-white text-sm m-1 rounded">
-          <Link to={"/member"}>Login</Link>
-        </div>
+        {!loginState.email ? (
+          <div className="text-white text-sm m-1 rounded">
+            <Link to={"/member"}>Login</Link>
+          </div>
+        ) : (
+          <div className="text-white text-sm m-1 rounded">
+            <Link to={"/member/logout"}>Logout</Link>
+          </div>
+        )}
       </div>
     </nav>
   );
