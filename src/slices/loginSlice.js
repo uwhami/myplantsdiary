@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loginPost } from "../api/memberApi";
 import { create } from "axios";
+import { setCookie } from "../util/cookieUtil";
 
 const initState = {
   email: "",
@@ -29,6 +30,13 @@ const loginSlice = createSlice({
     builder
       .addCase(loginPostAsync.fulfilled, (state, action) => {
         console.log("fulfilled");
+        const payload = action.payload;
+        console.log(!payload.error);
+        if (!payload.error) {
+          console.log("cookie");
+          setCookie("member", JSON.stringify(payload));
+        }
+
         return action.payload;
       })
       .addCase(loginPostAsync.pending, (state, action) => {
