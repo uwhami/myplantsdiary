@@ -22,7 +22,9 @@ const loginSlice = createSlice({
       console.log(state);
       console.log(action);
       console.log(action.payload);
-      return { email: action.payload.email, password: action.payload.password };
+
+      setCookie("member", JSON.stringify(action.payload));
+      return action.payload;
     },
     logout: (state, action) => {
       console.log(action.payload);
