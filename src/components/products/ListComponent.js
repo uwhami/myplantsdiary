@@ -32,7 +32,6 @@ function ListComponent(props) {
     getList({ page, size }).then((data) => {
       setFetching(false);
       setServerData(data);
-      console.log(data);
     });
   }, [page, size, refresh]);
 

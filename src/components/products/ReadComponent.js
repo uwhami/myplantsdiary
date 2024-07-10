@@ -3,6 +3,8 @@ import { API_SERVER_HOST } from "../../api/todoApi";
 import { getOne } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import useCustomMove from "../../hooks/useCustomMove";
+import useCustomCart from "../../hooks/useCustomCart";
+import useCustomLogin from "../../hooks/useCustomLogin";
 
 const initState = {
   pno: 0,
@@ -19,6 +21,9 @@ function ReadComponent({ pno }) {
   const [fetching, setFetching] = useState(false);
   const { moveToList, moveToModify } = useCustomMove();
 
+  const { cartItems, changeCart } = useCustomCart();
+  const { loginState } = useCustomLogin();
+
   useEffect(() => {
     setFetching(true);
     getOne(pno).then((data) => {
@@ -27,6 +32,20 @@ function ReadComponent({ pno }) {
       setFetching(false);
     });
   }, [pno]);
+
+  const handleClickAddCart = () => {
+    let quantity = 1;
+    const addedItem = cartItems.filter((item) => item.pno === parseInt(pno))[0];
+    if (addedItem) {
+      if (
+        !window.confirm("이미 장바구니에 있는 상품입니다. 추가하시겠습니까?")
+      ) {
+        return;
+      }
+      quantity = addedItem.quantity + 1;
+    }
+    changeCart({ email: loginState.email, pno: pno, quantity: quantity });
+  };
 
   return (
     <div>
@@ -40,10 +59,10 @@ function ReadComponent({ pno }) {
       <div className="flex justify-end p-4">
         <button
           type="button"
-          className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500"
-          onClick={() => moveToList()}
+          className="rounded p-4 m-2 text-xl w-32 text-white bg-green-500"
+          onClick={() => handleClickAddCart()}
         >
-          List
+          Add Cart
         </button>
 
         <button
@@ -52,6 +71,14 @@ function ReadComponent({ pno }) {
           onClick={() => moveToModify(product.pno)}
         >
           Modify
+        </button>
+
+        <button
+          type="button"
+          className="rounded p-4 m-2 text-xl w-32 text-white bg-blue-500"
+          onClick={() => moveToList()}
+        >
+          List
         </button>
       </div>
     </div>
