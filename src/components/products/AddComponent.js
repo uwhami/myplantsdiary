@@ -3,6 +3,7 @@ import { postAdd } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import ResultModal from "../common/ResultModal";
 import useCustomMove from "../../hooks/useCustomMove";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const initState = {
   pname: "",
@@ -17,12 +18,16 @@ function AddComponent(props) {
   const [product, setProduct] = useState({ ...initState });
 
   const uploadRef = useRef();
-  const [fetching, setFetching] = useState(false);
-  const [result, setResult] = useState(false);
+  // const [fetching, setFetching] = useState(false);
+  // const [result, setResult] = useState(false);
 
   const { moveToList } = useCustomMove();
 
   // multipart/form-data FormData()
+
+  const addMutation = useMutation({
+    mutationFn: (product) => postAdd(product),
+  });
 
   const handleChangeProduct = (e) => {
     product[e.target.name] = e.target.value;
@@ -41,19 +46,21 @@ function AddComponent(props) {
     formData.append("pdesc", product.pdesc);
     formData.append("price", product.price);
 
-    console.log(formData);
+    addMutation.mutate(formData);
 
-    setFetching(true);
+    // setFetching(true);
 
-    postAdd(formData).then((data) => {
-      setFetching(false);
-      setResult(data.result);
-      console.log(data.result);
-    });
+    // postAdd(formData).then((data) => {
+    //   setFetching(false);
+    //   setResult(data.result);
+    // });
   };
 
+  const queryClient = useQueryClient();
+
   const closeModal = () => {
-    setResult(null);
+    // setResult(null);
+    queryClient.invalidateQueries("products/list");
     moveToList();
   };
 
@@ -118,11 +125,11 @@ function AddComponent(props) {
         </div>
       </div>
 
-      {fetching ? <FetchingModal /> : <></>}
-      {result ? (
+      {addMutation.isPending ? <FetchingModal /> : <></>}
+      {addMutation.isSuccess ? (
         <ResultModal
           title={"Product Add Result"}
-          content={`${result} Register Completed`}
+          content={`${addMutation.data.result} Register Completed`}
           callbackFn={closeModal}
         />
       ) : (
