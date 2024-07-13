@@ -4,6 +4,7 @@ import { getList } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import { API_SERVER_HOST } from "../../api/todoApi";
 import PageComponent from "../common/PageComponent";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const initState = {
   dataList: [],
@@ -23,21 +24,40 @@ const host = API_SERVER_HOST;
 function ListComponent(props) {
   const { moveToList, moveToRead, page, size, refresh } = useCustomMove();
 
-  const [serverData, setServerData] = useState(initState);
+  // const [serverData, setServerData] = useState(initState);
 
-  const [fetching, setFetching] = useState(false);
+  const { data, isFetching } = useQuery({
+    queryKey: ["products/list", { page, size, refresh }],
+    queryFn: () => getList({ page, size }),
+    staleTime: 1000 * 30, // 30초 동안은 데이터를 새로 가지고 오지 않음.
+  });
 
-  useEffect(() => {
-    setFetching(true);
-    getList({ page, size }).then((data) => {
-      setFetching(false);
-      setServerData(data);
-    });
-  }, [page, size, refresh]);
+  // if (isFetching) {
+  //   return <FetchingModal />;
+  // }
+
+  // const queryClient = useQueryClient();
+
+  const handleClickPage = (pageParam) => {
+    // if (pageParam.page === parseInt(page)) {
+    //   queryClient.invalidateQueries("products/list");
+    // }
+    moveToList(pageParam);
+  };
+
+  const serverData = data || initState;
+
+  // useEffect(() => {
+  //   setFetching(true);
+  //   getList({ page, size }).then((data) => {
+  //     setFetching(false);
+  //     setServerData(data);
+  //   });
+  // }, [page, size, refresh]);
 
   return (
     <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
-      {fetching ? <FetchingModal /> : <></>}
+      {isFetching ? <FetchingModal /> : <></>}
       <div className="flex flex-wrap mx-auto p-6">
         {serverData.dataList.map((product) => (
           <div
@@ -66,7 +86,7 @@ function ListComponent(props) {
           </div>
         ))}
       </div>
-      <PageComponent serverData={serverData} movePage={moveToList} />
+      <PageComponent serverData={serverData} movePage={handleClickPage} />
     </div>
   );
 }
