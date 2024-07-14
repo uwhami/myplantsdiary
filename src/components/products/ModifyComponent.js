@@ -4,6 +4,7 @@ import FetchingModal from "../common/FetchingModal";
 import { API_SERVER_HOST } from "../../api/todoApi";
 import ResultModal from "../common/ResultModal";
 import useCustomMove from "../../hooks/useCustomMove";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /* eslint-disable multiline-ternary */
 const initState = {
@@ -19,20 +20,34 @@ const host = API_SERVER_HOST;
 
 function ModifyComponent({ pno }) {
   const [product, setProduct] = useState({ ...initState });
-  const [fetching, setFetching] = useState(false);
-  const [result, setResult] = useState(null);
   const { moveToRead, moveToList } = useCustomMove();
+
+  const delMutation = useMutation({ mutationFn: () => deleteOne(pno) });
+
+  const modMutation = useMutation({
+    mutationFn: (product) => putOne(pno, product),
+  });
+
+  const query = useQuery({
+    queryKey: ["product", pno],
+    queryFn: () => getOne(pno),
+    staleTime: Infinity,
+  });
 
   const uploadRef = useRef();
 
   useEffect(() => {
-    setFetching(true);
+    // setFetching(true);
+    //
+    // getOne(pno).then((data) => {
+    //   setProduct(data);
+    //   setFetching(false);
+    // });
 
-    getOne(pno).then((data) => {
-      setProduct(data);
-      setFetching(false);
-    });
-  }, [pno]);
+    if (query.isSuccess) {
+      setProduct(query.data);
+    }
+  }, [pno, query.data, query.isSuccess]);
 
   const handleChangeProduct = (e) => {
     product[e.target.name] = e.target.value;
@@ -64,36 +79,65 @@ function ModifyComponent({ pno }) {
       formData.append("uploadFileNames", product.uploadFileNames[i]);
     }
 
-    putOne(pno, formData).then((data) => {
-      setFetching(true);
-      if (data.RESULT === "SUCCESS") {
-        setResult("Modified");
-        setFetching(false);
-      }
-    });
+    // putOne(pno, formData).then((data) => {
+    //   setFetching(true);
+    //   if (data.RESULT === "SUCCESS") {
+    //     setResult("Modified");
+    //     setFetching(false);
+    //   }
+    // });
+
+    modMutation.mutate(formData);
   };
 
   const handleClickDelete = () => {
-    deleteOne(pno).then((data) => {
-      console.log("delete result", data);
-      setResult(data.RESULT === "SUCCESS" ? "Deleted" : null);
-    });
+    // deleteOne(pno).then((data) => {
+    //   console.log("delete result", data);
+    //   setResult(data.RESULT === "SUCCESS" ? "Deleted" : null);
+    // });
+
+    delMutation.mutate(pno);
   };
 
+  const queryClient = useQueryClient();
+
   const closeModal = () => {
-    if (result === "Deleted") {
+    // if (result === "Deleted") {
+    //   moveToList();
+    // } else if (result === "Modified") {
+    //   moveToRead(pno);
+    // } else {
+    //   setResult(null);
+    // }
+    queryClient.invalidateQueries(["products", pno]);
+    queryClient.invalidateQueries(["products/list"]);
+    if (delMutation.isSuccess) {
       moveToList();
-    } else if (result === "Modified") {
+    }
+    if (modMutation.isSuccess) {
       moveToRead(pno);
-    } else {
-      setResult(null);
     }
   };
 
   return (
     <div className="border-2 order-sky-200 mt-10 m-2 p-4">
       Products Modify Component
-      {fetching ? <FetchingModal /> : <></>}
+      {/* {fetching ? <FetchingModal /> : <></>} */}
+      {query.isFetching || delMutation.isPending || modMutation.isPending ? (
+        <FetchingModal style="z-index:1px" />
+      ) : (
+        <></>
+      )}
+      {delMutation.isSuccess || modMutation.isSuccess ? (
+        <ResultModal
+          style="z-index:1px"
+          title={"처리결과"}
+          content={"정상적으로 처리되었습니다."}
+          callbackFn={closeModal}
+        />
+      ) : (
+        <></>
+      )}
       <div className="flex justify-center">
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <div className="w-1/5 p-6 text-right font-bold">NAME</div>
@@ -195,15 +239,15 @@ function ModifyComponent({ pno }) {
           Modify
         </button>
       </div>
-      {result ? (
-        <ResultModal
-          title="처리 결과"
-          content={`${result} ${pno} Completed`}
-          callbackFn={closeModal}
-        />
-      ) : (
-        <></>
-      )}
+      {/* {result ? ( */}
+      {/*   <ResultModal */}
+      {/*     title="처리 결과" */}
+      {/*     content={`${result} ${pno} Completed`} */}
+      {/*     callbackFn={closeModal} */}
+      {/*   /> */}
+      {/* ) : ( */}
+      {/*   <></> */}
+      {/* )} */}
     </div>
   );
 }

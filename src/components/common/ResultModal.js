@@ -1,11 +1,11 @@
 import React from "react";
 
-function ResultModal({ title, content, callbackFn }) {
+const ResultModal = ({ title, content, callbackFn }) => {
   // bg-opacity-20 : 20%정도 까맣다(bg-black)
   // console.log(props);
   return (
     <div
-      className={`fixed top-0 left-0 z[1055] flex h-full w-full justify-center bg-black bg-opacity-20`}
+      className={`fixed top-0 left-0 z-[1055] flex h-full w-full justify-center mx-auto bg-black bg-opacity-20 items-center`}
       onClick={() => {
         if (callbackFn) {
           callbackFn();
@@ -36,6 +36,6 @@ function ResultModal({ title, content, callbackFn }) {
       </div>
     </div>
   );
-}
+};
 
 export default ResultModal;
