@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import useCustomLogin from "../../hooks/useCustomLogin";
 
 /* eslint-disable multiline-ternary */
 function BasicMenu(props) {
-  const loginState = useSelector((state) => state.loginSlice);
+  // const loginState = useSelector((state) => state.loginSlice);
+  //
+  // console.log("loginSlice....");
+  // console.log(loginState);
 
-  console.log("loginSlice....");
-  console.log(loginState);
+  const { loginState } = useCustomLogin();
 
   return (
     <nav id="navbar" className="flex bg-blue-300">
