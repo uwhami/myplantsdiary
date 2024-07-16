@@ -9,11 +9,11 @@ import { RecoilRoot } from "recoil";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Provider store={store}>
-    <RecoilRoot>
-      <App />
-    </RecoilRoot>
-  </Provider>,
+  // <Provider store={store}>
+  <RecoilRoot>
+    <App />
+  </RecoilRoot>,
+  // </Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function
