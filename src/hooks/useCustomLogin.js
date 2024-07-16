@@ -5,6 +5,7 @@ import { signinState } from "../atoms/signinState";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { removeCookies, setCookie } from "../util/cookieUtil";
 import { loginPost } from "../api/memberApi";
+import { cartState } from "../atoms/cartState";
 
 const useCustomLogin = () => {
   const [loginState, setLoginState] = useRecoilState(signinState);
@@ -12,6 +13,7 @@ const useCustomLogin = () => {
   const navigate = useNavigate();
   // const dispatch = useDispatch();
   // const loginState = useSelector((state) => state.loginSlice);
+  const resetCartState = useRecoilState(cartState);
 
   const exceptionHandle = (ex) => {
     console.log("Excpeption------------------------------");
@@ -42,6 +44,7 @@ const useCustomLogin = () => {
     // dispatch(logout());
     removeCookies(`member`);
     resetState();
+    resetCartState();
   };
 
   const saveAsCookie = (data) => {
@@ -70,6 +73,7 @@ const useCustomLogin = () => {
     moveToLogin,
     moveToLoginReturn,
     exceptionHandle,
+    saveAsCookie,
   };
 };
 
