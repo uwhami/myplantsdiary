@@ -1,5 +1,5 @@
 # myplantsdiary
-myplantsdiary front
+React-Spring Boot App Front
 
 # Getting Started with Create React App
 
