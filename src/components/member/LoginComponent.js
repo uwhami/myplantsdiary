@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { login, loginPostAsync } from "../../slices/loginSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import useCustomLogin from "../../hooks/useCustomLogin";
 import KakaoLoginComponent from "./KakaoLoginComponent";
+import GoogleLoginComponent from "./GoogleLoginComponent";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const initState = {
   email: "",
@@ -13,36 +14,29 @@ const initState = {
 function LoginComponent(props) {
   const [loginParam, setLoginParams] = useState({ ...initState });
 
-  const { doLogin, moveToPath } = useCustomLogin();
+  const dispatch = useDispatch();
 
+  const navigate = useNavigate();
   const handleChange = (e) => {
     loginParam[e.target.name] = e.target.value;
     setLoginParams({ ...loginParam });
   };
 
   const handleClickLogin = (e) => {
-    // dispatch(login(loginParam));
-    // dispatch(loginPostAsync(loginParam))
-    //   .unwrap()
-    //   .then((data) => {
-    //     console.log("dispatch");
-    //     console.log(data);
-    //     if (data.error) {
-    //       alert("이메일과 패스워드를 확인해 주세요.");
-    //     } else {
-    //       alert("로그인 성공!");
-    //
-    //       navigate({ pathname: "/" }, { replace: true });
-    //     }
-    //   });
+    dispatch(login(loginParam));
+    dispatch(loginPostAsync(loginParam))
+      .unwrap()
+      .then((data) => {
+        console.log("dispatch");
+        console.log(data);
+        if (data.error) {
+          alert("이메일과 패스워드를 확인해 주세요.");
+        } else {
+          alert("로그인 성공!");
 
-    doLogin(loginParam).then((data) => {
-      if (data.error) {
-        alert("이메일과 패스워드를 확인해 주세요");
-      } else {
-        moveToPath("/");
-      }
-    });
+          navigate({ pathname: "/" }, { replace: true });
+        }
+      });
   };
 
   return (
@@ -90,6 +84,9 @@ function LoginComponent(props) {
       </div>
 
       <KakaoLoginComponent />
+      <GoogleOAuthProvider clientId="911003399285-1k0382kjs7jos5i1rrjq092e1co0k5os.apps.googleusercontent.com">
+        <GoogleLoginComponent />
+      </GoogleOAuthProvider>
     </div>
   );
 }

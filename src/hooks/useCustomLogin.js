@@ -1,19 +1,12 @@
 import { createSearchParams, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginPostAsync, logout } from "../slices/loginSlice";
-import { signinState } from "../atoms/signinState";
-import { useRecoilState, useResetRecoilState } from "recoil";
 import { removeCookies, setCookie } from "../util/cookieUtil";
-import { loginPost } from "../api/memberApi";
-import { cartState } from "../atoms/cartState";
 
 const useCustomLogin = () => {
-  const [loginState, setLoginState] = useRecoilState(signinState);
-  const resetState = useResetRecoilState(signinState);
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  // const loginState = useSelector((state) => state.loginSlice);
-  const resetCartState = useRecoilState(cartState);
+  const dispatch = useDispatch();
+  const loginState = useSelector((state) => state.loginSlice);
 
   const exceptionHandle = (ex) => {
     console.log("Excpeption------------------------------");
@@ -33,23 +26,17 @@ const useCustomLogin = () => {
   const isLogin = !!loginState.email;
 
   const doLogin = async (loginParam) => {
-    // const action = await dispatch(loginPostAsync(loginParam));
-    // return action.payload;
-    const result = await loginPost(loginParam);
-    saveAsCookie(result);
-    return result;
+    const action = await dispatch(loginPostAsync(loginParam));
+    return action.payload;
   };
 
   const doLogout = () => {
-    // dispatch(logout());
+    dispatch(logout());
     removeCookies(`member`);
-    resetState();
-    resetCartState();
   };
 
   const saveAsCookie = (data) => {
     setCookie(`member`, JSON.stringify(data), 1);
-    setLoginState(data);
   };
 
   const moveToPath = (path) => {
